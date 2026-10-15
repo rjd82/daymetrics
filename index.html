@@ -7,13 +7,10 @@
   <meta name="theme-color" content="#0f172a" />
 
   <!-- ===================================================================== -->
-  <!-- 🔑 PASTE YOUR SUPABASE URL AND ANON KEY RIGHT HERE (LINES 16 & 17)!   -->
+  <!-- 🔑 YOUR SUPABASE URL AND ANON KEY ARE ALREADY PRE-FILLED BELOW!       -->
   <!-- ===================================================================== -->
   <script>
-    // 👇 Put your Project URL inside the quotes below (from Supabase -> Project Settings -> Data API)
-    const DEFAULT_SUPABASE_URL = 'https://miaywhnnioseevezzkmd.supabase.co/rest/v1/';
-
-    // 👇 Put your anon public key inside the quotes below (from Supabase -> Project Settings -> API Keys)
+    const DEFAULT_SUPABASE_URL = 'https://miaywhnnioseevezzkmd.supabase.co';
     const DEFAULT_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1pYXl3aG5uaW9zZWV2ZXp6a21kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE5NTYyNzEsImV4cCI6MjEwNzUzMjI3MX0.vUZYTEKhyBN_sPQfD4D-RNIZb69a48W5jl4Klq_P5f0';
   </script>
   <!-- ===================================================================== -->
@@ -24,8 +21,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Inter', sans-serif; background-color: #090d16; color: #f1f5f9; }
-    .glass { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.6); }
+    .glass { background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.65); }
     input[type="number"]::-webkit-inner-spin-button { opacity: 1; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 9999px; }
   </style>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
@@ -33,265 +32,319 @@
   <!-- TOP NAVIGATION BAR -->
   <header class="sticky top-0 z-30 glass px-4 py-3 flex items-center justify-between">
     <div class="flex items-center gap-3">
-      <button id="menuBtn" onclick="toggleDrawer(true)" class="p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-200" aria-label="Menu">
+      <button id="menuBtn" onclick="toggleDrawer(true)" class="p-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 transition" aria-label="Menu">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
       <div>
         <div class="flex items-center gap-2">
           <span class="font-bold text-base tracking-tight text-white">DayMetrics</span>
-          <span id="modeBadge" class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Checking...</span>
+          <span id="modeBadge" class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Connecting...</span>
         </div>
         <p id="liveClock" class="text-[11px] text-slate-400">Loading local time...</p>
       </div>
     </div>
+
     <div id="navTabs" class="hidden flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800 text-xs">
-      <button onclick="switchPage('home')" id="tab-home" class="px-2.5 py-1.5 rounded-lg font-medium bg-indigo-600 text-white">Daily</button>
-      <button onclick="switchPage('deep')" id="tab-deep" class="px-2.5 py-1.5 rounded-lg font-medium text-slate-400 hover:text-white">Graphs</button>
-      <button onclick="switchPage('ai')" id="tab-ai" class="px-2.5 py-1.5 rounded-lg font-medium text-slate-400 hover:text-white">AI Predict</button>
+      <button onclick="switchPage('home')" id="tab-home" class="px-3 py-1.5 rounded-lg font-semibold bg-indigo-600 text-white transition">Daily</button>
+      <button onclick="switchPage('deep')" id="tab-deep" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition">7 Graphs</button>
+      <button onclick="switchPage('ai')" id="tab-ai" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition">AI Predict</button>
     </div>
   </header>
 
   <!-- SLIDE-OUT HAMBURGER MENU -->
   <div id="drawerOverlay" onclick="toggleDrawer(false)" class="fixed inset-0 bg-black/60 z-40 hidden"></div>
-  <aside id="drawer" class="fixed top-0 left-0 bottom-0 w-72 glass z-50 transform -translate-x-full transition-transform duration-200 p-5 flex flex-col justify-between">
+  <aside id="drawer" class="fixed top-0 left-0 bottom-0 w-72 glass z-50 transform -translate-x-full transition-transform duration-200 p-5 flex flex-col justify-between overflow-y-auto">
     <div>
       <div class="flex items-center justify-between pb-4 border-b border-slate-800">
-        <span class="font-bold text-lg text-white">Menu & Settings</span>
-        <button onclick="toggleDrawer(false)" class="text-slate-400 hover:text-white text-xl">&times;</button>
+        <span class="font-bold text-base text-white">Menu & Settings</span>
+        <button onclick="toggleDrawer(false)" class="text-slate-400 hover:text-white text-2xl leading-none">&times;</button>
       </div>
+
       <div id="userInfoBox" class="my-4 p-3 rounded-xl bg-slate-900/90 border border-slate-800 text-xs space-y-1">
-        <div class="text-slate-400">Signed in as:</div>
+        <div class="text-slate-400">Signed in account:</div>
         <div id="userEmailDisplay" class="font-semibold text-white truncate">Not signed in</div>
         <div id="userStartDisplay" class="text-[11px] text-indigo-400"></div>
       </div>
 
-      <div class="space-y-2 text-sm">
-        <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800 space-y-2">
-          <div class="text-xs font-semibold text-slate-300">Daily Targets (Hours)</div>
+      <div class="space-y-2.5 text-sm">
+        <div class="p-3 rounded-xl bg-slate-900/70 border border-slate-800 space-y-2.5">
+          <div class="text-xs font-semibold text-slate-200">🎯 Personal Daily Targets</div>
           <div class="grid grid-cols-2 gap-2">
-            <label class="text-xs text-slate-400">Work Goal
-              <input id="targetWorkInput" type="number" step="0.5" min="1" max="16" value="8" class="mt-1 w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1 text-white text-xs">
+            <label class="text-[11px] text-slate-400">Work Goal (h)
+              <input id="targetWorkInput" type="number" step="0.5" min="1" max="18" value="8" class="mt-1 w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-white text-xs">
             </label>
-            <label class="text-xs text-slate-400">Sleep Goal
-              <input id="targetSleepInput" type="number" step="0.5" min="4" max="12" value="7.5" class="mt-1 w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1 text-white text-xs">
+            <label class="text-[11px] text-slate-400">Sleep Goal (h)
+              <input id="targetSleepInput" type="number" step="0.5" min="4" max="12" value="7.5" class="mt-1 w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-white text-xs">
             </label>
           </div>
-          <button onclick="saveTargets()" class="w-full py-1.5 rounded-lg bg-indigo-600/80 hover:bg-indigo-600 text-xs font-medium text-white">Save Targets</button>
+          <button onclick="saveTargets()" class="w-full py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white transition">Save Targets</button>
         </div>
 
-        <button id="pwaInstallBtn" onclick="installPWA()" class="hidden w-full text-left px-3 py-2.5 rounded-xl hover:bg-slate-800 flex items-center justify-between">
-          <span>📲 Install App</span>
+        <button id="pwaInstallBtn" onclick="installPWA()" class="hidden w-full text-left px-3 py-2.5 rounded-xl hover:bg-slate-800 flex items-center justify-between text-xs font-medium">
+          <span>📲 Install App on Device</span>
         </button>
-        <button onclick="shareWebsite()" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-slate-800 flex items-center justify-between">
-          <span>🔗 Share Website</span>
+        <button onclick="shareWebsite()" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-slate-800 flex items-center justify-between text-xs font-medium">
+          <span>🔗 Share Website Link</span>
         </button>
-        <button onclick="exportCSV()" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-slate-800 flex items-center justify-between">
-          <span>📊 Download CSV</span>
+        <button onclick="exportCSV()" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-slate-800 flex items-center justify-between text-xs font-medium">
+          <span>📊 Download CSV Report</span>
         </button>
-        <button onclick="exportJSON()" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-slate-800 flex items-center justify-between">
-          <span>📦 Backup JSON</span>
+        <button onclick="exportJSON()" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-slate-800 flex items-center justify-between text-xs font-medium">
+          <span>📦 Backup JSON Data</span>
         </button>
-        <button onclick="deleteAllMyRecords()" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-rose-950/60 text-rose-400 flex items-center justify-between">
-          <span>🗑️ Delete All My Data</span>
+        <button onclick="deleteAllMyRecords()" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-rose-950/60 text-rose-400 flex items-center justify-between text-xs font-medium">
+          <span>🗑️ Delete All My Records</span>
         </button>
       </div>
     </div>
 
     <div class="pt-4 border-t border-slate-800 space-y-2">
-      <button onclick="handleLogout()" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-sm font-medium text-white">Log Out</button>
+      <button onclick="handleLogout()" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-white transition">Log Out</button>
     </div>
   </aside>
 
-  <!-- AUTHENTICATION SCREEN -->
+  <!-- ===================================================================== -->
+  <!-- EMAIL + OTP ONLY AUTHENTICATION SCREEN (NO GOOGLE LOGIN)              -->
+  <!-- ===================================================================== -->
   <main id="authScreen" class="flex-1 flex items-center justify-center p-4">
     <div class="w-full max-w-md glass rounded-2xl p-6 space-y-5 shadow-2xl">
-      <div class="text-center space-y-1">
-        <h1 class="text-2xl font-bold text-white">Welcome to DayMetrics</h1>
-        <p class="text-xs text-slate-400">Sign in to sync your 24-hour analytics across all devices.</p>
+      <div class="text-center space-y-1.5">
+        <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 text-xl font-bold mb-1">
+          ⏱️
+        </div>
+        <h1 class="text-2xl font-bold text-white">DayMetrics Cloud</h1>
+        <p class="text-xs text-slate-400">Enter your email address to receive your one-time verification code (OTP).</p>
       </div>
 
-      <div id="authStatusMsg" class="hidden p-3 rounded-xl text-xs font-medium"></div>
+      <!-- Status / Error Banner -->
+      <div id="authStatusMsg" class="hidden p-3.5 rounded-xl text-xs font-medium leading-relaxed"></div>
 
-      <!-- Google OAuth Button -->
-      <button onclick="loginWithGoogle()" class="w-full py-3 px-4 rounded-xl bg-white hover:bg-slate-100 text-slate-900 font-semibold text-sm flex items-center justify-center gap-3 shadow">
-        <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.4 1 3.5 3.6 1.6 7.4l3.7 2.8C6.2 7.2 8.9 5 12 5z"/><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.6l3.7 2.9c2.2-2 3.7-5 3.7-8.7z"/><path fill="#FBBC05" d="M5.3 14.8c-.2-.8-.4-1.6-.4-2.5s.2-1.7.4-2.5L1.6 7C.6 9 0 11.2 0 13.5s.6 4.5 1.6 6.5l3.7-2.9z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3.1 0-5.8-2.1-6.7-5l-3.7 2.8C3.5 21.4 7.4 24 12 24z"/></svg>
-        Continue with Google
-      </button>
-
-      <div class="relative flex py-1 items-center">
-        <div class="flex-grow border-t border-slate-800"></div>
-        <span class="flex-shrink mx-3 text-xs text-slate-500">OR EMAIL VERIFICATION</span>
-        <div class="flex-grow border-t border-slate-800"></div>
-      </div>
-
-      <!-- Email Input & Magic Link / OTP -->
+      <!-- STEP 1: Enter Email & Send OTP -->
       <div class="space-y-3">
         <div>
-          <label class="block text-xs text-slate-400 mb-1">Email Address</label>
-          <input id="authEmailInput" type="email" placeholder="you@example.com" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
+          <label for="authEmailInput" class="block text-xs font-semibold text-slate-300 mb-1.5">Email Address</label>
+          <input id="authEmailInput" type="email" autocomplete="email" placeholder="you@example.com"
+            onkeydown="if(event.key==='Enter') sendEmailVerification()"
+            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500" />
         </div>
-        <button id="sendOtpBtn" onclick="sendEmailVerification()" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition">
-          Send Login Link / Code to Email
-        </button>
 
-        <!-- Optional 6-digit OTP box if user enters a code -->
-        <div id="otpVerifyBox" class="hidden pt-2 space-y-2 border-t border-slate-800">
-          <p class="text-xs text-emerald-400">✅ Check your email inbox! Click the confirmation link inside the email, OR if your email has a code, enter it below:</p>
-          <div class="flex gap-2">
-            <input id="authOtpInput" type="text" placeholder="Code (if using OTP)" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white text-center tracking-widest">
-            <button onclick="verifyEmailOtp()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs">Verify Code</button>
-          </div>
-        </div>
+        <button id="sendOtpBtn" onclick="sendEmailVerification()"
+          class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-semibold text-sm shadow-lg shadow-indigo-600/25 transition">
+          Send OTP Code to Email
+        </button>
       </div>
 
-      <div class="pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-        <span>Just testing the charts?</span>
-        <button onclick="startDemoMode()" class="text-indigo-400 hover:text-indigo-300 font-semibold underline">Preview Demo Mode</button>
+      <!-- STEP 2: Enter OTP Code -->
+      <div id="otpVerifyBox" class="hidden pt-4 space-y-3 border-t border-slate-800">
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label for="authOtpInput" class="text-xs font-semibold text-emerald-400">Enter OTP Code from Email</label>
+            <span id="otpTimerText" class="text-[11px] text-slate-400"></span>
+          </div>
+          <input id="authOtpInput" type="text" inputmode="numeric" maxlength="8" placeholder="Enter 6 or 8 digit OTP"
+            onkeydown="if(event.key==='Enter') verifyEmailOtp()"
+            class="w-full bg-slate-900 border border-emerald-500/50 rounded-xl px-3.5 py-3 text-base font-mono text-white text-center tracking-[0.35em] focus:outline-none focus:border-emerald-400" />
+        </div>
+
+        <button id="verifyOtpBtn" onclick="verifyEmailOtp()"
+          class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm shadow-lg shadow-emerald-600/25 transition">
+          Verify OTP & Sign In
+        </button>
+
+        <p class="text-[11px] text-slate-400 text-center">
+          Didn't get the code? Check your Spam folder or click <button onclick="sendEmailVerification()" id="resendLinkBtn" class="text-indigo-400 underline font-medium">Resend OTP</button>.
+        </p>
+      </div>
+
+      <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+        <span>Want to test charts right now?</span>
+        <button onclick="startDemoMode()" class="text-indigo-400 hover:text-indigo-300 font-semibold underline">Open Demo Preview</button>
       </div>
     </div>
   </main>
 
-  <!-- MAIN APPLICATION SCREEN -->
-  <div id="appScreen" class="hidden flex-1 max-w-2xl w-full mx-auto p-4 space-y-5 pb-16">
+  <!-- ===================================================================== -->
+  <!-- MAIN APPLICATION SCREEN                                               -->
+  <!-- ===================================================================== -->
+  <div id="appScreen" class="hidden flex-1 max-w-3xl w-full mx-auto p-4 space-y-5 pb-16">
 
-    <!-- PAGE 1: SIMPLE MOBILE-FIRST DAILY DASHBOARD -->
+    <!-- PAGE 1: MOBILE-FIRST DAILY DASHBOARD -->
     <section id="page-home" class="space-y-5">
+
       <!-- Daily Entry Card -->
-      <div class="glass rounded-2xl p-4 space-y-4">
-        <div class="flex items-center justify-between">
+      <div class="glass rounded-2xl p-4 sm:p-5 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
           <div>
             <h2 class="text-base font-bold text-white">Log Your 24 Hours</h2>
             <p id="selectedWeekdayLabel" class="text-xs text-slate-400">Select date</p>
           </div>
-          <input id="entryDate" type="date" onchange="onDateChange()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white" />
+          <input id="entryDate" type="date" onchange="onDateChange()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500" />
         </div>
 
-        <!-- 3 Simple Inputs (Hours & Minutes) -->
+        <!-- Three Core Daily Inputs (Hours + Minutes) -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <!-- Sleep -->
-          <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800">
-            <div class="flex justify-between items-center mb-1.5">
+          <div class="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800">
+            <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-semibold text-indigo-400">😴 Sleep (Night before)</span>
             </div>
-            <div class="flex gap-1.5">
-              <div class="flex-1"><input id="sleepH" type="number" min="0" max="24" placeholder="7" oninput="updateLiveRemaining()" class="w-full bg-slate-800 rounded-lg px-2.5 py-2 text-sm text-white"><span class="text-[10px] text-slate-500">hrs</span></div>
-              <div class="flex-1"><input id="sleepM" type="number" min="0" max="59" placeholder="30" oninput="updateLiveRemaining()" class="w-full bg-slate-800 rounded-lg px-2.5 py-2 text-sm text-white"><span class="text-[10px] text-slate-500">min</span></div>
+            <div class="flex gap-2">
+              <div class="flex-1">
+                <input id="sleepH" type="number" min="0" max="24" placeholder="7" oninput="updateLiveRemaining()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-2 text-sm text-white">
+                <span class="text-[10px] text-slate-400 mt-0.5 block">Hours</span>
+              </div>
+              <div class="flex-1">
+                <input id="sleepM" type="number" min="0" max="59" placeholder="30" oninput="updateLiveRemaining()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-2 text-sm text-white">
+                <span class="text-[10px] text-slate-400 mt-0.5 block">Minutes</span>
+              </div>
             </div>
           </div>
 
           <!-- Productive Work -->
-          <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800">
-            <div class="flex justify-between items-center mb-1.5">
+          <div class="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800">
+            <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-semibold text-emerald-400">⚡ Productive Work</span>
             </div>
-            <div class="flex gap-1.5">
-              <div class="flex-1"><input id="workH" type="number" min="0" max="24" placeholder="6" oninput="updateLiveRemaining()" class="w-full bg-slate-800 rounded-lg px-2.5 py-2 text-sm text-white"><span class="text-[10px] text-slate-500">hrs</span></div>
-              <div class="flex-1"><input id="workM" type="number" min="0" max="59" placeholder="0" oninput="updateLiveRemaining()" class="w-full bg-slate-800 rounded-lg px-2.5 py-2 text-sm text-white"><span class="text-[10px] text-slate-500">min</span></div>
+            <div class="flex gap-2">
+              <div class="flex-1">
+                <input id="workH" type="number" min="0" max="24" placeholder="6" oninput="updateLiveRemaining()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-2 text-sm text-white">
+                <span class="text-[10px] text-slate-400 mt-0.5 block">Hours</span>
+              </div>
+              <div class="flex-1">
+                <input id="workM" type="number" min="0" max="59" placeholder="0" oninput="updateLiveRemaining()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-2 text-sm text-white">
+                <span class="text-[10px] text-slate-400 mt-0.5 block">Minutes</span>
+              </div>
             </div>
           </div>
 
           <!-- Wasted Time -->
-          <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800">
-            <div class="flex justify-between items-center mb-1.5">
+          <div class="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800">
+            <div class="flex justify-between items-center mb-2">
               <span class="text-xs font-semibold text-rose-400">⏳ Wasted Time</span>
             </div>
-            <div class="flex gap-1.5">
-              <div class="flex-1"><input id="wasteH" type="number" min="0" max="24" placeholder="2" oninput="updateLiveRemaining()" class="w-full bg-slate-800 rounded-lg px-2.5 py-2 text-sm text-white"><span class="text-[10px] text-slate-500">hrs</span></div>
-              <div class="flex-1"><input id="wasteM" type="number" min="0" max="59" placeholder="0" oninput="updateLiveRemaining()" class="w-full bg-slate-800 rounded-lg px-2.5 py-2 text-sm text-white"><span class="text-[10px] text-slate-500">min</span></div>
+            <div class="flex gap-2">
+              <div class="flex-1">
+                <input id="wasteH" type="number" min="0" max="24" placeholder="2" oninput="updateLiveRemaining()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-2 text-sm text-white">
+                <span class="text-[10px] text-slate-400 mt-0.5 block">Hours</span>
+              </div>
+              <div class="flex-1">
+                <input id="wasteM" type="number" min="0" max="59" placeholder="0" oninput="updateLiveRemaining()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-2 text-sm text-white">
+                <span class="text-[10px] text-slate-400 mt-0.5 block">Minutes</span>
+              </div>
             </div>
           </div>
         </div>
 
         <!-- Optional Phone Distraction Subset -->
-        <details class="text-xs bg-slate-900/50 rounded-xl px-3 py-2 border border-slate-800/80">
-          <summary class="cursor-pointer text-slate-400 hover:text-slate-200 font-medium">+ Optional: Log Phone/Distraction Time (subset of Wasted Time)</summary>
-          <div class="mt-2 flex items-center gap-3">
-            <input id="phoneH" type="number" min="0" max="24" placeholder="Hrs" class="w-20 bg-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white">
-            <input id="phoneM" type="number" min="0" max="59" placeholder="Min" class="w-20 bg-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white">
-            <span class="text-[11px] text-slate-400">Included inside Wasted Time (not added to 24h total).</span>
+        <details class="text-xs bg-slate-900/60 rounded-xl px-3.5 py-2.5 border border-slate-800">
+          <summary class="cursor-pointer text-slate-300 hover:text-white font-medium">+ Optional: Phone / Distraction Time (subset inside Wasted Time)</summary>
+          <div class="mt-2.5 flex flex-wrap items-center gap-3">
+            <input id="phoneH" type="number" min="0" max="24" placeholder="Hrs" class="w-20 bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white">
+            <input id="phoneM" type="number" min="0" max="59" placeholder="Min" class="w-20 bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white">
+            <span class="text-[11px] text-slate-400">Counted as part of Wasted Time (never double-added to 24h).</span>
           </div>
         </details>
 
         <!-- Remaining Untracked Bar & Save Button -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
           <div class="text-xs">
-            <span class="text-slate-400">Untracked / Routine: </span>
+            <span class="text-slate-400">Untracked / Daily Routine: </span>
             <span id="untrackedLive" class="font-bold text-slate-200">24.0h (100%)</span>
             <p id="formError" class="text-rose-400 text-[11px] mt-0.5 hidden"></p>
           </div>
           <div class="flex gap-2">
-            <button id="deleteDayBtn" onclick="deleteCurrentDay()" class="hidden px-3 py-2.5 rounded-xl bg-rose-950/70 hover:bg-rose-900 text-rose-300 text-xs font-semibold">Delete</button>
-            <button id="saveEntryBtn" onclick="saveDailyEntry()" class="flex-1 sm:flex-initial px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm shadow-lg shadow-indigo-600/30">
+            <button id="deleteDayBtn" onclick="deleteCurrentDay()" class="hidden px-3.5 py-2.5 rounded-xl bg-rose-950/80 hover:bg-rose-900 text-rose-300 text-xs font-semibold transition">Delete</button>
+            <button id="saveEntryBtn" onclick="saveDailyEntry()" class="flex-1 sm:flex-initial px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm shadow-lg shadow-indigo-600/30 transition">
               Save Entry
             </button>
           </div>
         </div>
       </div>
 
-      <!-- Key Metrics Strip -->
+      <!-- 4 Key Dashboard Metrics -->
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-        <div class="glass rounded-xl p-3">
+        <div class="glass rounded-xl p-3.5">
           <div class="text-[11px] text-slate-400">Focus Efficiency</div>
-          <div id="kpiEfficiency" class="text-lg font-bold text-white mt-0.5">—</div>
+          <div id="kpiEfficiency" class="text-lg font-bold text-white mt-0.5">Unavailable</div>
           <div class="text-[10px] text-slate-500">Work / (Work + Waste)</div>
         </div>
-        <div class="glass rounded-xl p-3">
+        <div class="glass rounded-xl p-3.5">
           <div class="text-[11px] text-slate-400">Productive Work</div>
           <div id="kpiWork" class="text-lg font-bold text-emerald-400 mt-0.5">0.0h</div>
           <div id="kpiWorkPct" class="text-[10px] text-slate-500">0% of 24h</div>
         </div>
-        <div class="glass rounded-xl p-3">
+        <div class="glass rounded-xl p-3.5">
           <div class="text-[11px] text-slate-400">Sleep (Recovery)</div>
           <div id="kpiSleep" class="text-lg font-bold text-indigo-400 mt-0.5">0.0h</div>
-          <div class="text-[10px] text-slate-500">Never penalized</div>
+          <div id="kpiSleepPct" class="text-[10px] text-slate-500">Never penalized</div>
         </div>
-        <div class="glass rounded-xl p-3">
+        <div class="glass rounded-xl p-3.5">
           <div class="text-[11px] text-slate-400">Daily Status</div>
-          <div id="kpiStatus" class="text-sm font-bold text-slate-200 mt-1">No History</div>
-          <div id="kpiStatusSub" class="text-[10px] text-slate-500">vs 7-day avg</div>
+          <div id="kpiStatus" class="text-sm font-bold text-slate-200 mt-1">Clean Slate</div>
+          <div id="kpiStatusSub" class="text-[10px] text-slate-500">Log your first day</div>
         </div>
       </div>
 
       <!-- Primary 7-Day Daily Balance Graph -->
-      <div class="glass rounded-2xl p-4 space-y-3">
-        <div class="flex items-center justify-between">
+      <div class="glass rounded-2xl p-4 sm:p-5 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
           <div>
             <h3 class="text-sm font-bold text-white">7-Day Daily Balance</h3>
-            <p class="text-[11px] text-slate-400">Switch between hours breakdown and efficiency trend</p>
+            <p class="text-[11px] text-slate-400">Switch between stacked 24-hour bars and Focus Efficiency % trend</p>
           </div>
           <div class="flex bg-slate-900 p-1 rounded-xl border border-slate-800 text-xs">
-            <button id="homeChartHoursBtn" onclick="setHomeChartMode('hours')" class="px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-medium">Hours</button>
-            <button id="homeChartEffBtn" onclick="setHomeChartMode('efficiency')" class="px-2.5 py-1 rounded-lg text-slate-400">Efficiency %</button>
+            <button id="homeChartHoursBtn" onclick="setHomeChartMode('hours')" class="px-3 py-1 rounded-lg bg-indigo-600 text-white font-medium">Hours</button>
+            <button id="homeChartEffBtn" onclick="setHomeChartMode('efficiency')" class="px-3 py-1 rounded-lg text-slate-400">Efficiency %</button>
           </div>
         </div>
-        <div class="h-60 relative">
+        <div class="h-64 relative">
           <canvas id="homePrimaryChart"></canvas>
         </div>
       </div>
+
+      <!-- Multi-Metric Comparison Breakdown Card -->
+      <div class="glass rounded-2xl p-4 sm:p-5 space-y-2">
+        <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Transparent Multi-Metric Comparison (Selected Day vs. History)</h3>
+        <p id="comparisonSummaryText" class="text-xs text-slate-400 leading-relaxed">
+          Record at least 2 days to compare your Focus Efficiency, Productive Work, Wasted Time, and Sleep Duration against yesterday and your 7-day rolling average.
+        </p>
+      </div>
     </section>
 
-    <!-- PAGE 2: DEEP ANALYSIS (ALL 7 GRAPHS) -->
+    <!-- PAGE 2: DEEP ANALYSIS (ALL 7 GRAPHS + DATE RANGES) -->
     <section id="page-deep" class="hidden space-y-4">
-      <div class="glass rounded-2xl p-4 space-y-3">
+      <div class="glass rounded-2xl p-4 sm:p-5 space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-2">
-          <h2 class="text-base font-bold text-white">Deep Analysis (7 Visualizations)</h2>
-          <select id="rangeFilter" onchange="renderDeepChart()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white">
+          <div>
+            <h2 class="text-base font-bold text-white">Deep Analysis (7 Visualizations)</h2>
+            <p class="text-xs text-slate-400">Explore your real cloud-synced productivity records</p>
+          </div>
+          <select id="rangeFilter" onchange="onRangeFilterChange()" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white">
             <option value="7">Last 7 Recorded Days</option>
             <option value="14">Last 14 Recorded Days</option>
             <option value="30">Last 30 Recorded Days</option>
             <option value="all">All Recorded History</option>
+            <option value="custom">Custom Date Range</option>
           </select>
         </div>
 
-        <!-- Graph Selector Pills -->
+        <!-- Custom Date Range Inputs -->
+        <div id="customRangeBox" class="hidden flex flex-wrap items-center gap-2 p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-xs">
+          <span class="text-slate-400">From:</span>
+          <input id="customStart" type="date" onchange="renderDeepChart()" class="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-white">
+          <span class="text-slate-400">To:</span>
+          <input id="customEnd" type="date" onchange="renderDeepChart()" class="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-white">
+        </div>
+
+        <!-- 7 Graph Selector Buttons -->
         <div class="flex overflow-x-auto gap-1.5 pb-1 text-xs">
-          <button onclick="selectDeepGraph(1)" id="gbtn-1" class="px-3 py-1.5 rounded-xl bg-indigo-600 text-white whitespace-nowrap">1. Donut (24h)</button>
-          <button onclick="selectDeepGraph(2)" id="gbtn-2" class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 whitespace-nowrap">2. Stacked Bar</button>
-          <button onclick="selectDeepGraph(3)" id="gbtn-3" class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 whitespace-nowrap">3. 100% Proportional</button>
-          <button onclick="selectDeepGraph(4)" id="gbtn-4" class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 whitespace-nowrap">4. Trend Line</button>
-          <button onclick="selectDeepGraph(5)" id="gbtn-5" class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 whitespace-nowrap">5. Heatmap</button>
-          <button onclick="selectDeepGraph(6)" id="gbtn-6" class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 whitespace-nowrap">6. Sleep vs Work</button>
-          <button onclick="selectDeepGraph(7)" id="gbtn-7" class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 whitespace-nowrap">7. Target Progress</button>
+          <button onclick="selectDeepGraph(1)" id="gbtn-1" class="px-3 py-1.5 rounded-xl bg-indigo-600 text-white font-medium whitespace-nowrap">1. Donut (24h)</button>
+          <button onclick="selectDeepGraph(2)" id="gbtn-2" class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 font-medium whitespace-nowrap">2. Stacked Bar</button>
+          <button onclick="selectDeepGraph(3)" id="gbtn-3" class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 font-medium whitespace-nowrap">3. 100% Proportional</button>
+          <button onclick="selectDeepGraph(4)" id="gbtn-4" class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 font-medium whitespace-nowrap">4. Trend + 7d Avg</button>
+          <button onclick="selectDeepGraph(5)" id="gbtn-5" class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 font-medium whitespace-nowrap">5. Calendar Heatmap</button>
+          <button onclick="selectDeepGraph(6)" id="gbtn-6" class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 font-medium whitespace-nowrap">6. Sleep vs Work</button>
+          <button onclick="selectDeepGraph(7)" id="gbtn-7" class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 font-medium whitespace-nowrap">7. Target Progress</button>
         </div>
 
         <p id="deepGraphDesc" class="text-xs text-slate-400"></p>
@@ -300,42 +353,42 @@
           <canvas id="deepChartCanvas"></canvas>
         </div>
 
-        <!-- Calendar Heatmap Container (when Graph 5 is active) -->
-        <div id="heatmapContainer" class="hidden grid grid-cols-7 gap-2 pt-2"></div>
+        <!-- Calendar Heatmap Grid -->
+        <div id="heatmapContainer" class="hidden grid grid-cols-4 sm:grid-cols-7 gap-2 pt-2"></div>
       </div>
     </section>
 
     <!-- PAGE 3: PERSONALIZED AI PRODUCTIVITY INSIGHTS -->
     <section id="page-ai" class="hidden space-y-4">
-      <div class="glass rounded-2xl p-4 space-y-4">
-        <div class="flex items-center justify-between">
+      <div class="glass rounded-2xl p-4 sm:p-5 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
           <div>
             <h2 class="text-base font-bold text-white">Personalized Productivity Forecast</h2>
-            <p class="text-xs text-slate-400">Bayesian / Ridge-regularized learning from your own sleep & work logs</p>
+            <p class="text-xs text-slate-400">Ridge-regularized regression trained strictly on your own history</p>
           </div>
           <span id="aiConfidenceBadge" class="text-[11px] px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold">Baseline Mode</span>
         </div>
 
-        <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
-          <label class="block text-xs text-slate-300 font-medium">
+        <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+          <label class="block text-xs text-slate-200 font-medium">
             Simulate Last Night's Sleep Duration: <span id="simSleepVal" class="text-indigo-400 font-bold">7.5 hrs</span>
           </label>
           <input id="simSleepSlider" type="range" min="3" max="11" step="0.5" value="7.5" oninput="updatePredictionView()" class="w-full accent-indigo-500">
-          <p class="text-[11px] text-slate-400">Evidence-based adult baseline: 7.0–9.0h optimal recovery window. Adjust your personal sleep goal in Menu &rarr; Targets.</p>
+          <p class="text-[11px] text-slate-400">Scientific note: Sleep is vital recovery, never wasted time. Optimal adult sleep is typically 7.0–9.0 hours.</p>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800">
+          <div class="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800">
             <div class="text-[11px] text-slate-400">Expected Productive Work</div>
             <div id="predWorkOut" class="text-lg font-bold text-emerald-400 mt-0.5">—</div>
             <div id="predWorkDelta" class="text-[11px] text-slate-400"></div>
           </div>
-          <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800">
+          <div class="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800">
             <div class="text-[11px] text-slate-400">Expected Focus Efficiency</div>
             <div id="predEffOut" class="text-lg font-bold text-indigo-400 mt-0.5">—</div>
             <div id="predEffUnc" class="text-[11px] text-slate-400"></div>
           </div>
-          <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800">
+          <div class="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800">
             <div class="text-[11px] text-slate-400">Phone / Distraction Forecast</div>
             <div id="predPhoneOut" class="text-sm font-bold text-rose-400 mt-1">—</div>
             <div id="predPhoneNote" class="text-[10px] text-slate-500"></div>
@@ -343,8 +396,8 @@
         </div>
 
         <div class="space-y-2">
-          <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Actual vs. Predicted Work Hours (Walk-Forward Accuracy)</h3>
-          <div class="h-52 relative">
+          <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Actual vs. Predicted Productive Work (Walk-Forward Validation)</h3>
+          <div class="h-56 relative">
             <canvas id="aiAccuracyChart"></canvas>
           </div>
         </div>
@@ -355,12 +408,12 @@
 
   <script>
     // =========================================================================
-    // STATE & SUPABASE INITIALIZATION
+    // GLOBAL STATE & INITIALIZATION
     // =========================================================================
     let supabaseClient = null;
     let currentUser = null;
     let isDemoMode = false;
-    let records = []; // Sorted ascending by date
+    let records = []; // Sorted ascending by date (YYYY-MM-DD)
     let userTargets = { work: 8.0, sleep: 7.5, createdDate: null };
     let homeChartMode = 'hours';
     let currentDeepGraph = 1;
@@ -368,6 +421,7 @@
     let deepChartInstance = null;
     let aiChartInstance = null;
     let deferredInstallPrompt = null;
+    let otpCooldownTimer = null;
 
     function getLocalTodayStr() {
       const now = new Date();
@@ -393,13 +447,18 @@
     });
 
     async function initApp() {
-      const url = DEFAULT_SUPABASE_URL.trim();
-      const key = DEFAULT_SUPABASE_ANON_KEY.trim();
+      try {
+        const url = DEFAULT_SUPABASE_URL.trim();
+        const key = DEFAULT_SUPABASE_ANON_KEY.trim();
 
-      if (url && key && !url.includes('PASTE_YOUR') && !key.includes('PASTE_YOUR')) {
-        supabaseClient = window.supabase.createClient(url, key);
+        supabaseClient = window.supabase.createClient(url, key, {
+          auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true
+          }
+        });
 
-        // Listen for Magic Link redirect, Google OAuth redirect, or session restore
         supabaseClient.auth.onAuthStateChange(async (event, session) => {
           if (session && session.user) {
             currentUser = session.user;
@@ -410,26 +469,33 @@
           }
         });
 
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (session && session.user) {
-          currentUser = session.user;
+        const { data, error } = await supabaseClient.auth.getSession();
+        if (error) {
+          document.getElementById('modeBadge').textContent = 'Auth Ready';
+          showAuthScreen();
+          return;
+        }
+
+        if (data && data.session && data.session.user) {
+          currentUser = data.session.user;
           await loadCloudAccount();
         } else {
           document.getElementById('modeBadge').textContent = 'Cloud Ready';
           showAuthScreen();
         }
-      } else {
-        document.getElementById('modeBadge').textContent = 'Setup Needed';
-        showAuthMessage('Paste your Supabase URL and Anon Key on Lines 16 & 17 of index.html, or click Preview Demo Mode below.', 'amber');
+      } catch (err) {
+        document.getElementById('modeBadge').textContent = 'Offline / Check Network';
+        showAuthMessage('Could not initialize cloud connection: ' + (err.message || err), 'rose');
       }
     }
 
     function showAuthMessage(msg, color = 'indigo') {
       const box = document.getElementById('authStatusMsg');
-      box.classList.remove('hidden', 'bg-rose-950/80', 'text-rose-300', 'bg-emerald-950/80', 'text-emerald-300', 'bg-amber-950/80', 'text-amber-300');
-      if (color === 'rose') box.classList.add('bg-rose-950/80', 'text-rose-300');
-      else if (color === 'emerald') box.classList.add('bg-emerald-950/80', 'text-emerald-300');
-      else box.classList.add('bg-amber-950/80', 'text-amber-300');
+      box.classList.remove('hidden', 'bg-rose-950/90', 'text-rose-200', 'border-rose-500/40', 'bg-emerald-950/90', 'text-emerald-200', 'border-emerald-500/40', 'bg-amber-950/90', 'text-amber-200', 'border-amber-500/40', 'border');
+      box.classList.add('border');
+      if (color === 'rose') box.classList.add('bg-rose-950/90', 'text-rose-200', 'border-rose-500/40');
+      else if (color === 'emerald') box.classList.add('bg-emerald-950/90', 'text-emerald-200', 'border-emerald-500/40');
+      else box.classList.add('bg-amber-950/90', 'text-amber-200', 'border-amber-500/40');
       box.textContent = msg;
     }
 
@@ -440,54 +506,123 @@
     }
 
     // =========================================================================
-    // AUTHENTICATION FLOWS (GOOGLE OAUTH + EMAIL MAGIC LINK / OTP)
+    // EMAIL + OTP AUTHENTICATION FLOW (BULLETPROOF, NO GOOGLE LOGIN)
     // =========================================================================
-    async function loginWithGoogle() {
-      if (!supabaseClient) return showAuthMessage('Please paste your Supabase keys on Lines 16 & 17 first!', 'rose');
-      const { error } = await supabaseClient.auth.signInWithOAuth({
-        provider: 'google',
-        options: { redirectTo: window.location.origin + window.location.pathname }
-      });
-      if (error) showAuthMessage(error.message, 'rose');
-    }
-
     async function sendEmailVerification() {
-      if (!supabaseClient) return showAuthMessage('Please paste your Supabase keys on Lines 16 & 17 first!', 'rose');
       const email = document.getElementById('authEmailInput').value.trim();
-      if (!email) return showAuthMessage('Please enter your email address first.', 'rose');
+      if (!email || !email.includes('@')) {
+        showAuthMessage('Please enter a valid email address.', 'rose');
+        return;
+      }
 
       const btn = document.getElementById('sendOtpBtn');
       btn.disabled = true;
-      btn.textContent = 'Sending...';
+      btn.textContent = 'Sending OTP to your email...';
 
-      const { error } = await supabaseClient.auth.signInWithOtp({
-        email,
-        options: { emailRedirectTo: window.location.origin + window.location.pathname }
-      });
+      try {
+        // Pure OTP sign-in call without fragile redirect URLs
+        const { error } = await supabaseClient.auth.signInWithOtp({
+          email: email,
+          options: {
+            shouldCreateUser: true
+          }
+        });
 
-      btn.disabled = false;
-      btn.textContent = 'Resend Login Link / Code';
+        btn.disabled = false;
+        btn.textContent = 'Resend OTP Code';
 
-      if (error) {
-        showAuthMessage(error.message, 'rose');
-      } else {
-        document.getElementById('otpVerifyBox').classList.remove('hidden');
-        showAuthMessage('Verification email sent! Click the link in your email inbox (or enter the code below).', 'emerald');
+        if (error) {
+          showAuthMessage('Supabase Auth Error: ' + error.message, 'rose');
+        } else {
+          document.getElementById('otpVerifyBox').classList.remove('hidden');
+          document.getElementById('authOtpInput').focus();
+          startOtpCooldown(60);
+          showAuthMessage('✅ OTP sent to ' + email + '! Enter the code from your email below.', 'emerald');
+        }
+      } catch (networkErr) {
+        btn.disabled = false;
+        btn.textContent = 'Send OTP Code to Email';
+        showAuthMessage(
+          'Network error ("' + (networkErr.message || 'Load failed') + '"). Make sure your Supabase project (miaywhnnioseevezzkmd) is Active/Unpaused in your Supabase dashboard and that you opened this site via your https:// Vercel link.',
+          'rose'
+        );
       }
+    }
+
+    function startOtpCooldown(seconds) {
+      if (otpCooldownTimer) clearInterval(otpCooldownTimer);
+      let rem = seconds;
+      const timerEl = document.getElementById('otpTimerText');
+      timerEl.textContent = `Resend available in ${rem}s`;
+      otpCooldownTimer = setInterval(() => {
+        rem--;
+        if (rem <= 0) {
+          clearInterval(otpCooldownTimer);
+          timerEl.textContent = 'Code valid for 5 mins';
+        } else {
+          timerEl.textContent = `Resend available in ${rem}s`;
+        }
+      }, 1000);
     }
 
     async function verifyEmailOtp() {
       const email = document.getElementById('authEmailInput').value.trim();
-      const token = document.getElementById('authOtpInput').value.trim();
-      if (!token) return showAuthMessage('Enter the code from your email, or simply click the confirmation link inside the email.', 'amber');
+      const token = document.getElementById('authOtpInput').value.trim().replace(/\s+/g, '');
 
-      const { error } = await supabaseClient.auth.verifyOtp({ email, token, type: 'email' });
-      if (error) showAuthMessage(error.message, 'rose');
+      if (!email) {
+        showAuthMessage('Please enter your email address above first.', 'rose');
+        return;
+      }
+      if (!token || token.length < 6) {
+        showAuthMessage('Please enter the 6-digit or 8-digit OTP code from your email.', 'amber');
+        return;
+      }
+
+      const verifyBtn = document.getElementById('verifyOtpBtn');
+      verifyBtn.disabled = true;
+      verifyBtn.textContent = 'Verifying OTP...';
+
+      try {
+        // Try 'email' first, then fallback to 'signup' and 'magiclink' so both new & existing accounts always succeed
+        const otpTypes = ['email', 'signup', 'magiclink'];
+        let lastError = null;
+        let verifiedSession = null;
+
+        for (const t of otpTypes) {
+          const { data, error } = await supabaseClient.auth.verifyOtp({
+            email: email,
+            token: token,
+            type: t
+          });
+          if (!error && data && data.session) {
+            verifiedSession = data.session;
+            break;
+          }
+          lastError = error;
+        }
+
+        verifyBtn.disabled = false;
+        verifyBtn.textContent = 'Verify OTP & Sign In';
+
+        if (verifiedSession) {
+          currentUser = verifiedSession.user;
+          isDemoMode = false;
+          await loadCloudAccount();
+        } else {
+          showAuthMessage('Invalid or expired OTP code: ' + (lastError ? lastError.message : 'Please request a new code.'), 'rose');
+        }
+      } catch (err) {
+        verifyBtn.disabled = false;
+        verifyBtn.textContent = 'Verify OTP & Sign In';
+        showAuthMessage('Verification error: ' + (err.message || err), 'rose');
+      }
     }
 
     async function handleLogout() {
       toggleDrawer(false);
-      if (supabaseClient && currentUser) await supabaseClient.auth.signOut();
+      if (supabaseClient && currentUser) {
+        await supabaseClient.auth.signOut();
+      }
       currentUser = null;
       isDemoMode = false;
       records = [];
@@ -495,7 +630,7 @@
     }
 
     // =========================================================================
-    // CLOUD PROFILE & RECORDS LOADING (CLEAN-SLATE ACCOUNT RULE)
+    // CLOUD ACCOUNT & DATABASE SYNC (CLEAN-SLATE ACCOUNT RULE)
     // =========================================================================
     async function loadCloudAccount() {
       document.getElementById('authScreen').classList.add('hidden');
@@ -507,16 +642,15 @@
       userTargets.createdDate = serverCreatedDate;
 
       document.getElementById('userEmailDisplay').textContent = currentUser.email || 'Authenticated User';
-      document.getElementById('userStartDisplay').textContent = `Tracking since: ${serverCreatedDate}`;
+      document.getElementById('userStartDisplay').textContent = `Account start date: ${serverCreatedDate}`;
 
-      // Enforce no pre-registration backdating
       const dateInput = document.getElementById('entryDate');
       const today = getLocalTodayStr();
       dateInput.min = serverCreatedDate;
       dateInput.max = today;
       dateInput.value = today;
 
-      // Load or create user_profiles row
+      // Load or create user profile
       const { data: prof } = await supabaseClient
         .from('user_profiles')
         .select('*')
@@ -566,7 +700,7 @@
     }
 
     // =========================================================================
-    // DEMO MODE (SEPARATED FROM REAL ACCOUNTS)
+    // DEMO PREVIEW MODE (ISOLATED FROM REAL ACCOUNTS)
     // =========================================================================
     function startDemoMode() {
       isDemoMode = true;
@@ -574,9 +708,9 @@
       document.getElementById('authScreen').classList.add('hidden');
       document.getElementById('appScreen').classList.remove('hidden');
       document.getElementById('navTabs').classList.remove('hidden');
-      document.getElementById('modeBadge').textContent = 'Demo Preview';
-      document.getElementById('userEmailDisplay').textContent = 'Demo Mode (Not saved to cloud)';
-      document.getElementById('userStartDisplay').textContent = 'Sample 7-day preview';
+      document.getElementById('modeBadge').textContent = 'Demo Mode';
+      document.getElementById('userEmailDisplay').textContent = 'Demo Preview (Local Only)';
+      document.getElementById('userStartDisplay').textContent = 'Sample data — never touches real account';
 
       const today = new Date();
       records = [];
@@ -596,14 +730,13 @@
         const [s, w, wa, ph] = sample[6 - i];
         records.push({ date: dStr, sleep: s, work: w, waste: wa, phone: ph, predWork: +(w - 0.3).toFixed(2) });
       }
-      const dateInput = document.getElementById('entryDate');
-      dateInput.value = getLocalTodayStr();
+      document.getElementById('entryDate').value = getLocalTodayStr();
       onDateChange();
       refreshAllViews();
     }
 
     // =========================================================================
-    // DAILY LOGGING, VALIDATION & CALCULATIONS
+    // DAILY INPUTS & 24-HOUR VALIDATION
     // =========================================================================
     function hmToDec(hId, mId) {
       const h = parseFloat(document.getElementById(hId).value) || 0;
@@ -648,6 +781,7 @@
         document.getElementById('saveEntryBtn').textContent = 'Save Entry';
       }
       updateLiveRemaining();
+      refreshAllViews();
     }
 
     function updateLiveRemaining() {
@@ -660,7 +794,8 @@
       const err = document.getElementById('formError');
 
       if (total > 24.001) {
-        el.textContent = `Exceeds 24h by ${(total - 24).toFixed(2)}h!`;
+        const overBy = (total - 24).toFixed(2);
+        el.textContent = `Exceeds 24h by ${overBy}h!`;
         el.className = 'font-bold text-rose-400';
         err.textContent = 'Sleep + Productive Work + Wasted Time cannot exceed 24 hours.';
         err.classList.remove('hidden');
@@ -680,7 +815,7 @@
     async function saveDailyEntry() {
       const dateStr = document.getElementById('entryDate').value;
       if (!isDemoMode && userTargets.createdDate && dateStr < userTargets.createdDate) {
-        alert(`Backdating before your account creation date (${userTargets.createdDate}) is not allowed.`);
+        alert(`You cannot backdate entries before your account registration date (${userTargets.createdDate}).`);
         return;
       }
 
@@ -692,15 +827,14 @@
       const phone = (phRawH !== '' || phRawM !== '') ? hmToDec('phoneH', 'phoneM') : null;
 
       if (sleep + work + waste > 24.001) {
-        alert('Total hours cannot exceed 24.0 hours in a single day.');
+        alert('Total recorded hours (Sleep + Work + Wasted) cannot exceed 24 hours.');
         return;
       }
       if (phone !== null && phone > waste + 0.001) {
-        alert('Phone/Distraction hours are a subset of Wasted Time and cannot exceed Wasted Time.');
+        alert('Phone/Distraction time is a subset of Wasted Time and cannot exceed Wasted Time.');
         return;
       }
 
-      // Compute walk-forward prediction using ONLY prior records before saving
       const priorRecords = records.filter(r => r.date < dateStr);
       const forecast = predictForSleep(sleep, priorRecords);
 
@@ -711,7 +845,6 @@
         else records.push(obj);
         records.sort((a, b) => a.date.localeCompare(b.date));
         onDateChange();
-        refreshAllViews();
         return;
       }
 
@@ -740,7 +873,7 @@
       btn.textContent = 'Update Entry';
 
       if (error) {
-        alert('Error saving to cloud: ' + error.message);
+        alert('Error saving record: ' + error.message);
       } else {
         await fetchCloudRecords();
       }
@@ -748,12 +881,11 @@
 
     async function deleteCurrentDay() {
       const dateStr = document.getElementById('entryDate').value;
-      if (!confirm(`Delete your record for ${dateStr}?`)) return;
+      if (!confirm(`Permanently delete your record for ${dateStr}?`)) return;
 
       if (isDemoMode) {
         records = records.filter(r => r.date !== dateStr);
         onDateChange();
-        refreshAllViews();
         return;
       }
 
@@ -762,35 +894,55 @@
     }
 
     // =========================================================================
-    // DASHBOARD METRICS & PRIMARY 7-DAY CHART
+    // DASHBOARD METRICS, MULTI-METRIC COMPARISON & 7-DAY PRIMARY GRAPH
     // =========================================================================
     function refreshAllViews() {
       const dateStr = document.getElementById('entryDate').value || getLocalTodayStr();
       const rec = records.find(r => r.date === dateStr) || records[records.length - 1];
+      const compEl = document.getElementById('comparisonSummaryText');
 
       if (!rec) {
         document.getElementById('kpiEfficiency').textContent = 'Unavailable';
         document.getElementById('kpiWork').textContent = '0.0h';
         document.getElementById('kpiWorkPct').textContent = '0% of 24h';
         document.getElementById('kpiSleep').textContent = '0.0h';
+        document.getElementById('kpiSleepPct').textContent = 'Never penalized';
         document.getElementById('kpiStatus').textContent = 'Clean Slate';
         document.getElementById('kpiStatusSub').textContent = 'Log your first day above';
+        compEl.textContent = 'No records logged yet. Enter today\'s Sleep, Productive Work, and Wasted Time above to start tracking.';
       } else {
         const eff = calcEfficiency(rec.work, rec.waste);
         document.getElementById('kpiEfficiency').textContent = eff !== null ? `${eff}%` : 'Unavailable';
         document.getElementById('kpiWork').textContent = `${rec.work.toFixed(1)}h`;
         document.getElementById('kpiWorkPct').textContent = `${Math.round((rec.work / 24) * 100)}% of 24h`;
         document.getElementById('kpiSleep').textContent = `${rec.sleep.toFixed(1)}h`;
+        document.getElementById('kpiSleepPct').textContent = `${Math.round((rec.sleep / 24) * 100)}% of 24h`;
 
         const prior = records.filter(r => r.date < rec.date).slice(-7);
         if (prior.length === 0) {
-          document.getElementById('kpiStatus').textContent = 'First Entry';
-          document.getElementById('kpiStatusSub').textContent = 'Building 7-day baseline';
+          document.getElementById('kpiStatus').textContent = 'Baseline Day';
+          document.getElementById('kpiStatusSub').textContent = 'First recorded entry';
+          compEl.textContent = `Showing ${rec.date}: Focus Efficiency is ${eff ?? 0}%, Productive Work is ${rec.work.toFixed(1)}h, Wasted Time is ${rec.waste.toFixed(1)}h, and Sleep is ${rec.sleep.toFixed(1)}h. Log another day to unlock multi-metric comparisons.`;
         } else {
           const avgWork = prior.reduce((s, r) => s + r.work, 0) / prior.length;
-          const diff = rec.work - avgWork;
-          document.getElementById('kpiStatus').textContent = diff >= 0.25 ? 'Improved ▲' : (diff <= -0.25 ? 'Declined ▼' : 'Stable ●');
-          document.getElementById('kpiStatusSub').textContent = `${diff >= 0 ? '+' : ''}${diff.toFixed(1)}h vs prior ${prior.length}d`;
+          const avgWaste = prior.reduce((s, r) => s + r.waste, 0) / prior.length;
+          const avgEff = prior.reduce((s, r) => s + (calcEfficiency(r.work, r.waste) || 0), 0) / prior.length;
+
+          let score = 0;
+          if ((eff || 0) >= avgEff + 2) score++;
+          else if ((eff || 0) <= avgEff - 2) score--;
+          if (rec.work >= avgWork + 0.3) score++;
+          else if (rec.work <= avgWork - 0.3) score--;
+          if (rec.waste <= avgWaste - 0.3) score++;
+          else if (rec.waste >= avgWaste + 0.3) score--;
+
+          const label = score >= 1 ? 'Improved ▲' : (score <= -1 ? 'Declined ▼' : 'Stable ●');
+          document.getElementById('kpiStatus').textContent = label;
+          document.getElementById('kpiStatusSub').textContent = `Multi-metric vs ${prior.length}d avg`;
+
+          const workDiff = rec.work - avgWork;
+          const wasteDiff = rec.waste - avgWaste;
+          compEl.textContent = `On ${rec.date}, compared to your previous ${prior.length}-day average: Productive Work changed by ${workDiff >= 0 ? '+' : ''}${workDiff.toFixed(1)}h (avg ${avgWork.toFixed(1)}h), Wasted Time changed by ${wasteDiff >= 0 ? '+' : ''}${wasteDiff.toFixed(1)}h (avg ${avgWaste.toFixed(1)}h), and Focus Efficiency is ${eff ?? 0}% (avg ${avgEff.toFixed(1)}%). Sleep (${rec.sleep.toFixed(1)}h) is tracked separately as healthy recovery.`;
         }
       }
 
@@ -801,8 +953,8 @@
 
     function setHomeChartMode(mode) {
       homeChartMode = mode;
-      document.getElementById('homeChartHoursBtn').className = mode === 'hours' ? 'px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-medium' : 'px-2.5 py-1 rounded-lg text-slate-400';
-      document.getElementById('homeChartEffBtn').className = mode === 'efficiency' ? 'px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-medium' : 'px-2.5 py-1 rounded-lg text-slate-400';
+      document.getElementById('homeChartHoursBtn').className = mode === 'hours' ? 'px-3 py-1 rounded-lg bg-indigo-600 text-white font-medium' : 'px-3 py-1 rounded-lg text-slate-400';
+      document.getElementById('homeChartEffBtn').className = mode === 'efficiency' ? 'px-3 py-1 rounded-lg bg-indigo-600 text-white font-medium' : 'px-3 py-1 rounded-lg text-slate-400';
       renderHomeChart();
     }
 
@@ -819,10 +971,10 @@
           data: {
             labels,
             datasets: [
-              { label: 'Sleep', data: last7.map(r => r.sleep), backgroundColor: '#6366f1' },
-              { label: 'Productive Work', data: last7.map(r => r.work), backgroundColor: '#10b981' },
-              { label: 'Wasted Time', data: last7.map(r => r.waste), backgroundColor: '#f43f5e' },
-              { label: 'Untracked', data: last7.map(r => +(24 - r.sleep - r.work - r.waste).toFixed(2)), backgroundColor: '#334155' }
+              { label: 'Sleep (h)', data: last7.map(r => r.sleep), backgroundColor: '#6366f1' },
+              { label: 'Productive Work (h)', data: last7.map(r => r.work), backgroundColor: '#10b981' },
+              { label: 'Wasted Time (h)', data: last7.map(r => r.waste), backgroundColor: '#f43f5e' },
+              { label: 'Untracked (h)', data: last7.map(r => Math.max(0, +(24 - r.sleep - r.work - r.waste).toFixed(2))), backgroundColor: '#334155' }
             ]
           },
           options: {
@@ -852,21 +1004,37 @@
     }
 
     // =========================================================================
-    // DEEP ANALYSIS (7 MODULAR VISUALIZATIONS)
+    // DEEP ANALYSIS: ALL 7 MODULAR VISUALIZATIONS & CUSTOM DATE FILTER
     // =========================================================================
+    function onRangeFilterChange() {
+      const val = document.getElementById('rangeFilter').value;
+      document.getElementById('customRangeBox').classList.toggle('hidden', val !== 'custom');
+      renderDeepChart();
+    }
+
+    function getFilteredSubset() {
+      const rangeVal = document.getElementById('rangeFilter').value;
+      if (rangeVal === 'all') return records;
+      if (rangeVal === 'custom') {
+        const s = document.getElementById('customStart').value || '0000-01-01';
+        const e = document.getElementById('customEnd').value || '9999-12-31';
+        return records.filter(r => r.date >= s && r.date <= e);
+      }
+      return records.slice(-Number(rangeVal));
+    }
+
     function selectDeepGraph(num) {
       currentDeepGraph = num;
       for (let i = 1; i <= 7; i++) {
         document.getElementById(`gbtn-${i}`).className = (i === num)
-          ? 'px-3 py-1.5 rounded-xl bg-indigo-600 text-white whitespace-nowrap'
-          : 'px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 whitespace-nowrap';
+          ? 'px-3 py-1.5 rounded-xl bg-indigo-600 text-white font-medium whitespace-nowrap'
+          : 'px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 font-medium whitespace-nowrap';
       }
       renderDeepChart();
     }
 
     function renderDeepChart() {
-      const rangeVal = document.getElementById('rangeFilter').value;
-      const subset = rangeVal === 'all' ? records : records.slice(-Number(rangeVal));
+      const subset = getFilteredSubset();
       const descEl = document.getElementById('deepGraphDesc');
       const canvasWrap = document.getElementById('deepCanvasContainer');
       const heatWrap = document.getElementById('heatmapContainer');
@@ -879,9 +1047,9 @@
         descEl.textContent = '5. Calendar Heatmap — Color-coded daily Focus Efficiency score to highlight consistency streaks.';
         heatWrap.innerHTML = subset.map(r => {
           const eff = calcEfficiency(r.work, r.waste) || 0;
-          const bg = eff >= 75 ? 'bg-emerald-600' : (eff >= 50 ? 'bg-indigo-600' : 'bg-rose-700');
-          return `<div class="${bg} p-2 rounded-xl text-center text-xs"><div class="font-bold">${eff}%</div><div class="text-[10px] opacity-80">${r.date.slice(5)}</div></div>`;
-        }).join('') || '<div class="col-span-7 text-xs text-slate-500">No records yet.</div>';
+          const bg = eff >= 75 ? 'bg-emerald-600/90 border-emerald-400/40' : (eff >= 50 ? 'bg-indigo-600/90 border-indigo-400/40' : 'bg-rose-700/90 border-rose-400/40');
+          return `<div class="${bg} border p-2.5 rounded-xl text-center text-xs"><div class="font-bold text-white">${eff}%</div><div class="text-[10px] text-slate-200 mt-0.5">${r.date.slice(5)}</div></div>`;
+        }).join('') || '<div class="col-span-7 text-xs text-slate-500">No records in selected range.</div>';
         return;
       }
 
@@ -891,19 +1059,19 @@
       const labels = subset.map(r => r.date.slice(5));
 
       if (currentDeepGraph === 1) {
-        descEl.textContent = '1. Donut Chart — 24-hour time allocation between Sleep, Work, Wasted, and Untracked time.';
+        descEl.textContent = '1. Donut Chart — Daily 24-hour time allocation between Sleep, Productive Work, Wasted Time, and Untracked hours.';
         const latest = subset[subset.length - 1] || { sleep: 0, work: 0, waste: 0 };
         const untracked = Math.max(0, +(24 - latest.sleep - latest.work - latest.waste).toFixed(2));
         deepChartInstance = new Chart(ctx, {
           type: 'doughnut',
           data: {
-            labels: ['Sleep', 'Productive Work', 'Wasted Time', 'Untracked'],
+            labels: ['Sleep (Recovery)', 'Productive Work', 'Wasted Time', 'Untracked'],
             datasets: [{ data: [latest.sleep, latest.work, latest.waste, untracked], backgroundColor: ['#6366f1', '#10b981', '#f43f5e', '#475569'] }]
           },
           options: { responsive: true, maintainAspectRatio: false }
         });
       } else if (currentDeepGraph === 2) {
-        descEl.textContent = '2. Stacked Bar Chart — Compares actual hours across recorded days.';
+        descEl.textContent = '2. Stacked Bar Chart — Day-by-day comparison of actual hours across recorded dates.';
         deepChartInstance = new Chart(ctx, {
           type: 'bar',
           data: {
@@ -912,13 +1080,13 @@
               { label: 'Sleep (h)', data: subset.map(r => r.sleep), backgroundColor: '#6366f1' },
               { label: 'Work (h)', data: subset.map(r => r.work), backgroundColor: '#10b981' },
               { label: 'Wasted (h)', data: subset.map(r => r.waste), backgroundColor: '#f43f5e' },
-              { label: 'Untracked (h)', data: subset.map(r => +(24 - r.sleep - r.work - r.waste).toFixed(2)), backgroundColor: '#334155' }
+              { label: 'Untracked (h)', data: subset.map(r => Math.max(0, +(24 - r.sleep - r.work - r.waste).toFixed(2))), backgroundColor: '#334155' }
             ]
           },
           options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true, max: 24 } } }
         });
       } else if (currentDeepGraph === 3) {
-        descEl.textContent = '3. 100% Stacked Bar Chart — Proportional percentage allocation across days.';
+        descEl.textContent = '3. 100% Stacked Bar Chart — Normalized proportional percentage analysis across days.';
         deepChartInstance = new Chart(ctx, {
           type: 'bar',
           data: {
@@ -927,31 +1095,36 @@
               { label: 'Sleep %', data: subset.map(r => +((r.sleep / 24) * 100).toFixed(1)), backgroundColor: '#6366f1' },
               { label: 'Work %', data: subset.map(r => +((r.work / 24) * 100).toFixed(1)), backgroundColor: '#10b981' },
               { label: 'Wasted %', data: subset.map(r => +((r.waste / 24) * 100).toFixed(1)), backgroundColor: '#f43f5e' },
-              { label: 'Untracked %', data: subset.map(r => +(((24 - r.sleep - r.work - r.waste) / 24) * 100).toFixed(1)), backgroundColor: '#334155' }
+              { label: 'Untracked %', data: subset.map(r => +((Math.max(0, 24 - r.sleep - r.work - r.waste) / 24) * 100).toFixed(1)), backgroundColor: '#334155' }
             ]
           },
           options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true, max: 100 } } }
         });
       } else if (currentDeepGraph === 4) {
-        descEl.textContent = '4. Line Graph — Tracks productive hours, wasted hours, and Focus Efficiency trend.';
+        descEl.textContent = '4. Line Graph — Tracks Productive Work, Wasted Hours, and your 7-Day Moving Average trend.';
+        const movAvg = subset.map((_, idx) => {
+          const slice = subset.slice(Math.max(0, idx - 6), idx + 1);
+          return +(slice.reduce((s, x) => s + x.work, 0) / slice.length).toFixed(2);
+        });
         deepChartInstance = new Chart(ctx, {
           type: 'line',
           data: {
             labels,
             datasets: [
               { label: 'Productive Work (h)', data: subset.map(r => r.work), borderColor: '#10b981', tension: 0.3 },
+              { label: '7-Day Moving Avg (Work)', data: movAvg, borderColor: '#38bdf8', borderDash: [5, 5], tension: 0.3 },
               { label: 'Wasted Time (h)', data: subset.map(r => r.waste), borderColor: '#f43f5e', tension: 0.3 }
             ]
           },
           options: { responsive: true, maintainAspectRatio: false }
         });
       } else if (currentDeepGraph === 6) {
-        descEl.textContent = '6. Scatter Plot — Investigates personal association between Sleep Duration and Productive Work.';
+        descEl.textContent = '6. Scatter Plot — Plots preceding Sleep Duration against Productive Work Hours without assuming causation.';
         deepChartInstance = new Chart(ctx, {
           type: 'scatter',
           data: {
             datasets: [{
-              label: 'Sleep (X) vs Productive Work (Y)',
+              label: 'Sleep Duration (X) vs Productive Work (Y)',
               data: subset.map(r => ({ x: r.sleep, y: r.work })),
               backgroundColor: '#38bdf8', pointRadius: 6
             }]
@@ -962,15 +1135,15 @@
           }
         });
       } else if (currentDeepGraph === 7) {
-        descEl.textContent = '7. Target Progress Chart — Compares actual Work and Sleep against your personal goals.';
+        descEl.textContent = '7. Target Progress Chart — Compares your actual Work and Sleep hours against your personal daily targets.';
         const latest = subset[subset.length - 1] || { work: 0, sleep: 0 };
         deepChartInstance = new Chart(ctx, {
           type: 'bar',
           data: {
-            labels: ['Productive Work', 'Sleep (Recovery)'],
+            labels: ['Productive Work (h)', 'Sleep Recovery (h)'],
             datasets: [
-              { label: 'Actual Hours', data: [latest.work, latest.sleep], backgroundColor: ['#10b981', '#6366f1'] },
-              { label: 'Target Goal', data: [userTargets.work, userTargets.sleep], backgroundColor: ['#334155', '#475569'] }
+              { label: 'Actual Logged', data: [latest.work, latest.sleep], backgroundColor: ['#10b981', '#6366f1'] },
+              { label: 'Personal Target', data: [userTargets.work, userTargets.sleep], backgroundColor: ['#334155', '#475569'] }
             ]
           },
           options: { responsive: true, maintainAspectRatio: false }
@@ -979,14 +1152,13 @@
     }
 
     // =========================================================================
-    // PERSONALIZED BAYESIAN / RIDGE PREDICTION MODEL
+    // PERSONALIZED BAYESIAN / RIDGE REGRESSION FORECASTING ENGINE
     // =========================================================================
     function predictForSleep(sleepInput, history = records) {
       const optSleep = userTargets.sleep || 7.5;
       const baseWork = userTargets.work || 7.5;
       const n = history.length;
 
-      // Evidence-based baseline curve penalized gently for severe sleep debt
       const sleepPenalty = Math.max(0, optSleep - sleepInput) * 0.45 + Math.max(0, sleepInput - (optSleep + 1.5)) * 0.25;
       const priorWork = Math.max(1, baseWork - sleepPenalty);
       const priorWaste = Math.min(10, 2.5 + sleepPenalty * 0.6);
@@ -997,18 +1169,17 @@
           expectedWork: +priorWork.toFixed(2),
           expectedWaste: +priorWaste.toFixed(2),
           expectedEff: eff,
-          confidence: `Preliminary Baseline (${n}/3 days logged)`,
-          uncertainty: '±1.8 hrs (Low personal data)',
+          confidence: `Preliminary Baseline (${n}/3 days)`,
+          uncertainty: '±1.8 hrs (Collecting personal history)',
           phoneForecast: null
         };
       }
 
-      // Ridge-regularized linear model blended with personal mean
       const meanS = history.reduce((s, r) => s + r.sleep, 0) / n;
       const meanW = history.reduce((s, r) => s + r.work, 0) / n;
       const meanWa = history.reduce((s, r) => s + r.waste, 0) / n;
 
-      let numW = 0, den = 4.0; // Ridge penalty lambda = 4.0
+      let numW = 0, den = 4.0;
       for (const r of history) {
         numW += (r.sleep - meanS) * (r.work - meanW);
         den += (r.sleep - meanS) ** 2;
@@ -1049,16 +1220,16 @@
 
       document.getElementById('aiConfidenceBadge').textContent = res.confidence;
       document.getElementById('predWorkOut').textContent = `${res.expectedWork} hrs`;
-      document.getElementById('predWorkDelta').textContent = `${pctDelta >= 0 ? '+' : ''}${pctDelta}% vs your ${userTargets.sleep}h sleep baseline`;
+      document.getElementById('predWorkDelta').textContent = `${pctDelta >= 0 ? '+' : ''}${pctDelta}% vs your ${userTargets.sleep}h sleep target`;
       document.getElementById('predEffOut').textContent = `${res.expectedEff}%`;
       document.getElementById('predEffUnc').textContent = `Uncertainty: ${res.uncertainty}`;
 
       if (res.phoneForecast !== null) {
         document.getElementById('predPhoneOut').textContent = `${res.phoneForecast} hrs`;
-        document.getElementById('predPhoneNote').textContent = 'Estimated from your phone logs';
+        document.getElementById('predPhoneNote').textContent = 'Learned from your phone logs';
       } else {
         document.getElementById('predPhoneOut').textContent = 'Not Yet Available';
-        document.getElementById('predPhoneNote').textContent = 'Log at least 3 days of optional Phone Time to unlock';
+        document.getElementById('predPhoneNote').textContent = 'Log 3+ days of optional Phone Time to unlock';
       }
 
       const ctx = document.getElementById('aiAccuracyChart').getContext('2d');
@@ -1084,8 +1255,8 @@
       ['home', 'deep', 'ai'].forEach(p => {
         document.getElementById(`page-${p}`).classList.toggle('hidden', p !== page);
         document.getElementById(`tab-${p}`).className = (p === page)
-          ? 'px-2.5 py-1.5 rounded-lg font-medium bg-indigo-600 text-white'
-          : 'px-2.5 py-1.5 rounded-lg font-medium text-slate-400 hover:text-white';
+          ? 'px-3 py-1.5 rounded-lg font-semibold bg-indigo-600 text-white transition'
+          : 'px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition';
       });
       if (page === 'deep') renderDeepChart();
       if (page === 'ai') updatePredictionView();
@@ -1113,7 +1284,7 @@
     function exportCSV() {
       const header = 'date,sleep_hours,work_hours,wasted_hours,phone_hours,untracked_hours,focus_efficiency_pct\n';
       const rows = records.map(r => {
-        const un = +(24 - r.sleep - r.work - r.waste).toFixed(2);
+        const un = Math.max(0, +(24 - r.sleep - r.work - r.waste).toFixed(2));
         const eff = calcEfficiency(r.work, r.waste) ?? '';
         return `${r.date},${r.sleep},${r.work},${r.waste},${r.phone ?? ''},${un},${eff}`;
       }).join('\n');
